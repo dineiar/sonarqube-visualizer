@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     // Preferences
     gitLabAccessToken: string;
+    filterText: string;
     filterNewIssues = true;
     filterSeverities: [{
         severity: SonarIssueSeverity,
@@ -62,6 +63,10 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         }
     }
 
+    getIssuesListCountKeys() {
+        return Object.keys(this.issuesListCount);
+    }
+
     ngAfterViewChecked() {
         // finished loading events
         this.layoutHelper.enableBootstrapComponents();
@@ -88,6 +93,9 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         }
     }
 
+    filterTextChanged() {
+        this.loadSonarIssues();
+    }
     filterNewIssuesChanged() {
         this.savePreferences();
         this.loadSonarIssues();
@@ -137,8 +145,20 @@ export class HomeComponent implements OnInit, AfterViewChecked {
             }
         }
 
+        if (this.filterText) {
+            const filterlc = this.filterText.toLowerCase();
+            this.issuesList = this.issuesList.filter(x =>
+                x.component.toLowerCase().indexOf(filterlc) > -1
+                || x.message.toLowerCase().indexOf(filterlc) > -1
+            );
+        }
+
+        this.issuesListCount = {};
         Object.keys(SonarIssueSeverity).forEach(s => {
             const colorClassName = this.sonarIssues.getSeverityColorClassName(SonarIssueSeverity[s]);
+            if (!(colorClassName in this.issuesListCount)) {
+                this.issuesListCount[colorClassName] = 0;
+            }
             this.issuesListCount[colorClassName] += this.issuesList.filter(x => x.severity === SonarIssueSeverity[s]).length;
         });
     }

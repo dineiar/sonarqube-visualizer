@@ -24,7 +24,9 @@
                 <li id="tab-nav-issues" class="nav-item">
                     <a class="nav-link active" data-toggle="tab" href="#tab-issues" role="tablist" aria-expanded="true">
                         Issues
-                        <span *ngFor="let ct of issuesListCount; let i = index">{{ct}} {{i}}</span>
+                        <span *ngFor="let color of getIssuesListCountKeys()" class="badge badge-pill badge-{{color}}" [hidden]="issuesListCount[color] == 0">
+                            {{issuesListCount[color]}}
+                        </span>
                     </a>
                 </li>
                 <li id="tab-nav-users" class="nav-item">
@@ -52,6 +54,12 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group label-floating">
+                                    <input type="text" [(ngModel)]="filterText" class="form-control" id="filterText" name="filter-text"
+                                        placeholder="Busca" (input)="filterTextChanged()">
+                                </div>
+                            </div>
                             <div class="col-md-3">
                                 <div class="togglebutton">
                                     <label>
@@ -62,13 +70,12 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="col-md-8" id="severity-filters">
+                            <div class="col-md-4" id="severity-filters">
                                 <div class="form-check form-check-inline" *ngFor="let sev of filterSeverities">
                                     <label class="form-check-label text-{{sonarIssues.getSeverityColorClassName(sev.severity)}}">
                                         <input type="checkbox" class="form-check-input" [name]="'filter-severity-' + sev.severity"
                                                 [(ngModel)]="sev.checked" (change)="filterSeveritiesChanged()" checked="checked">
                                         {{sonarIssues.getSeverityText(sev.severity)}}
-                                        <!-- <sonar-issue-severity [severity]="'BLOCKER'"></sonar-issue-severity> -->
                                         <span class="form-check-sign">
                                             <span class="check"></span>
                                         </span>
