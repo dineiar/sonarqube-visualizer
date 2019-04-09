@@ -1,0 +1,116 @@
+<div class="main container-fluid container-view" id="container-home">
+    <form>
+        <div class="form-group">
+            <input type="password" class="form-control" id="gitlab-access-token" name="gitlab-access-token" aria-describedby="gitlab-access-token-help"
+                placeholder="GitLab Access Token" [(ngModel)]="gitLabAccessToken" (change)="savePreferences()">
+            <small id="gitlab-access-token-help" class="form-text text-muted">
+                Este token será gravado no seu navegador e não será acessível por outras pessoas. O token de acesso à API do GitLab pode ser gerado
+                <a href="https://git.pje.csjt.jus.br/profile/personal_access_tokens" target="_blank">neste link</a>.
+            </small>
+        </div>
+        <div class="form-group form-file-upload form-file-simple">
+            <input type="text" name="sonarReportFileName" class="form-control inputFileVisible" placeholder="Relatório do Sonar..." aria-describedby="file-sonar-report-help"
+                #inputSonarReportFileName (click)="inputSelectFile()" [value]="sonarReportFile?.replace(fakepathPattern, '')">
+            <input name="file-upload" type="file" class="inputFileHidden" #inputSonarReportFileInput (change)="inputFileSelected($event)" [(ngModel)]="sonarReportFile">
+            <small id="file-sonar-report-help" class="form-text text-muted">
+                O relatório é gerado em um arquivo <code>sonar-report.json</code>, para mais informações
+                <a href="https://gitlab.trt4.gov.br/setic/cds/spe/pjekz/wikis/Configura%C3%A7%C3%A3o/Sonar" target="_blank">clique aqui</a>.
+            </small>
+        </div>
+    </form>
+    <div class="row" *ngIf="sonarReport">
+        <div class="col-md-12">
+            <ul id="tab-nav-report" class="nav nav-pills nav-pills-primary" role="tablist">
+                <li id="tab-nav-issues" class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#tab-issues" role="tablist" aria-expanded="true">
+                        Issues
+                        <span *ngFor="let ct of issuesListCount; let i = index">{{ct}} {{i}}</span>
+                    </a>
+                </li>
+                <li id="tab-nav-users" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab-users" role="tablist" aria-expanded="false">
+                        Usuários
+                    </a>
+                </li>
+                <li id="tab-nav-components" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab-components" role="tablist" aria-expanded="false">
+                        Componentes
+                    </a>
+                </li>
+                <li id="tab-nav-rules" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab-rules" role="tablist" aria-expanded="false">
+                        Regras
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content tab-space">
+                <div class="tab-pane active" id="tab-issues" aria-expanded="true">
+                    <form class="filters">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5>Filtros</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="togglebutton">
+                                    <label>
+                                        <input name="filter-new-issues" type="checkbox" checked="checked"
+                                            [(ngModel)]="filterNewIssues" (change)="filterNewIssuesChanged()">
+                                        <span class="toggle"></span>
+                                        Ver apenas issues novas
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-8" id="severity-filters">
+                                <div class="form-check form-check-inline" *ngFor="let sev of filterSeverities">
+                                    <label class="form-check-label text-{{sonarIssues.getSeverityColorClassName(sev.severity)}}">
+                                        <input type="checkbox" class="form-check-input" [name]="'filter-severity-' + sev.severity"
+                                                [(ngModel)]="sev.checked" (change)="filterSeveritiesChanged()" checked="checked">
+                                        {{sonarIssues.getSeverityText(sev.severity)}}
+                                        <!-- <sonar-issue-severity [severity]="'BLOCKER'"></sonar-issue-severity> -->
+                                        <span class="form-check-sign">
+                                            <span class="check"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <h5>{{issuesList?.length}} issues</h5>
+                    <table id="table-issues" class="table">
+                        <thead>
+                            <tr>
+                                <th>Severidade</th>
+                                <th>Data</th>
+                                <th>Arquivo</th>
+                                <th>Mensagem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let issue of issuesList">
+                                <td>
+                                    <sonar-issue-severity [severity]="issue.severity"></sonar-issue-severity>
+                                </td>
+                                <td>{{ issue | issueCreationDate }}</td>
+                                <td>
+                                    <code>{{ issue | issueFileName }}</code>
+                                </td>
+                                <td>{{ issue | issueMessage }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="tab-users" aria-expanded="false">
+                    Não implementado.
+                </div>
+                <div class="tab-pane" id="tab-components" aria-expanded="false">
+                    Não implementado.
+                </div>
+                <div class="tab-pane" id="tab-rules" aria-expanded="false">
+                    Não implementado.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
